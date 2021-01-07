@@ -1,65 +1,57 @@
 import Head from 'next/head'
-import styles from '../styles/Home.module.css'
+import Navbar from './components/Navbar'
+import Airtable from 'airtable';
+import { useEffect, useState } from 'react';
+import { table, minifyRecords } from "./api/utils/Airtable";
+import Todos from "../components/Todos"
 
-export default function Home() {
+
+
+export default function Home({ initialTodos }) {
+
   return (
-    <div className={styles.container}>
+    <div>
       <Head>
-        <title>Create Next App</title>
+        <title>Todo App</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
+      <main>
+        <Navbar />
+        <h1>To Do App</h1>
+        {/* <div>
+          {list.map((item) => (
+            <div key={item.id}>
+              <h2>{item.fields.description}</h2>
+              <input type="checkbox" defaultChecked={item.fields.completed} />
+            </div>
+          ))}
+        </div> */}
+        <ul>
+          {initialTodos.map((todo) => (
+            <Todos key={todo.id} todo={todo} />
+          ))}
+        </ul>
 
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
       </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
     </div>
   )
+}
+
+export async function getServerSideProps(context) {
+  try {
+    const todos = await table.select({}).firstPage();
+    return {
+      props: {
+        initialTodos: minifyRecords(todos)
+      }
+    }
+  } catch (error) {
+    console.error(error);
+    return {
+      props: {
+        error: "Something went wrong"
+      }
+    }
+  }
 }

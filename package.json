@@ -8,8 +8,13 @@
     "start": "next start"
   },
   "dependencies": {
+    "airtable": "^0.10.1",
     "next": "10.0.4",
     "react": "17.0.1",
     "react-dom": "17.0.1"
+  },
+  "devDependencies": {
+    "postcss-preset-env": "^6.7.0",
+    "tailwindcss": "^2.0.2"
   }
 }
