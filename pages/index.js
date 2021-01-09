@@ -1,13 +1,18 @@
 import Head from 'next/head'
 import Navbar from './components/Navbar'
 import Airtable from 'airtable';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { table, minifyRecords } from "./api/utils/Airtable";
 import Todos from "../components/Todos"
-
+import { TodosContext } from "../context/TodosContext";
 
 
 export default function Home({ initialTodos }) {
+  const { todos, setTodos } = useContext(TodosContext);
+
+  useEffect(() => {
+    setTodos(initialTodos)
+  }, [])
 
   return (
     <div>
@@ -28,9 +33,12 @@ export default function Home({ initialTodos }) {
           ))}
         </div> */}
         <ul>
-          {initialTodos.map((todo) => (
-            <Todos key={todo.id} todo={todo} />
-          ))}
+          {todos &&
+            todos.map((todo) => (
+              <Todos key={todo.id} todo={todo} />
+            ))
+          }
+
         </ul>
 
       </main>

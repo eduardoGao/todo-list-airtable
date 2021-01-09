@@ -54,9 +54,9 @@ const TodosProvider = ({ children }) => {
     }
   }
 
-  const deleteTodo = async ({ id }) => {
+  const deleteTodo = async (id) => {
     try {
-      const response = await fetch("/api/deleteTodo", {
+      await fetch("/api/deleteTodo", {
         method: 'DELETE',
         body: JSON.stringify({ id }),
         headers: {
@@ -64,10 +64,8 @@ const TodosProvider = ({ children }) => {
         }
       });
       setTodos((prevTodos) => {
-        return prevTodos.filter((todo) => {
-          todo.id !== id
-        })
-      })
+        return prevTodos.filter((todo) => todo.id !== id);
+      });
     } catch (error) {
       console.error(error)
     }
