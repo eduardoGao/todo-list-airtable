@@ -5,10 +5,12 @@ import { useEffect, useState, useContext } from 'react';
 import { table, minifyRecords } from "./api/utils/Airtable";
 import Todos from "../components/Todos"
 import { TodosContext } from "../context/TodosContext";
+import auth0 from "./api/utils/auth0";
 
-
-export default function Home({ initialTodos }) {
+export default function Home({ initialTodos, user }) {
   const { todos, setTodos } = useContext(TodosContext);
+
+  // console.log(user)
 
   useEffect(() => {
     setTodos(initialTodos)
@@ -22,7 +24,7 @@ export default function Home({ initialTodos }) {
       </Head>
 
       <main>
-        <Navbar />
+        <Navbar user={user} />
         <h1>To Do App</h1>
         {/* <div>
           {list.map((item) => (
@@ -47,11 +49,15 @@ export default function Home({ initialTodos }) {
 }
 
 export async function getServerSideProps(context) {
+  const session = await auth0.getSession(context.req);
+  // console.log(session)
+
   try {
     const todos = await table.select({}).firstPage();
     return {
       props: {
-        initialTodos: minifyRecords(todos)
+        initialTodos: minifyRecords(todos),
+        user: session?.user || null,
       }
     }
   } catch (error) {
