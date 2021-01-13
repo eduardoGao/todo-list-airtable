@@ -6,6 +6,7 @@ import { table, minifyRecords } from "./api/utils/Airtable";
 import Todos from "../components/Todos"
 import { TodosContext } from "../context/TodosContext";
 import auth0 from "./api/utils/auth0";
+import TodosForm from '../components/TodosForm';
 
 export default function Home({ initialTodos, user }) {
   const { todos, setTodos } = useContext(TodosContext);
@@ -14,7 +15,7 @@ export default function Home({ initialTodos, user }) {
 
   useEffect(() => {
     setTodos(initialTodos)
-  }, [])
+  }, []);
 
   return (
     <div>
@@ -23,25 +24,24 @@ export default function Home({ initialTodos, user }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
+      <Navbar user={user} />
       <main>
-        <Navbar user={user} />
-        <h1>To Do App</h1>
-        {/* <div>
-          {list.map((item) => (
-            <div key={item.id}>
-              <h2>{item.fields.description}</h2>
-              <input type="checkbox" defaultChecked={item.fields.completed} />
-            </div>
-          ))}
-        </div> */}
-        <ul>
-          {todos &&
-            todos.map((todo) => (
-              <Todos key={todo.id} todo={todo} />
-            ))
-          }
+        {user ?
+          <>
+            <h1 className='text-2xl text-center mb-4'>My Todo's</h1>
+            <TodosForm />
+            <ul>
+              {todos &&
+                todos.map((todo) => (
+                  <Todos key={todo.id} todo={todo} />
+                ))
+              }
+            </ul>
+          </>
+          :
+          <h1 className='text-xl text-center mb-4'>Login to see your to do's</h1>
+        }
 
-        </ul>
 
       </main>
     </div>
@@ -51,9 +51,16 @@ export default function Home({ initialTodos, user }) {
 export async function getServerSideProps(context) {
   const session = await auth0.getSession(context.req);
   // console.log(session)
+  let todos = [];
 
   try {
-    const todos = await table.select({}).firstPage();
+    if (session?.user) {
+      todos = await table.select({
+        filterByFormula: `userId = '${session.user.sub}'`
+      })
+        .firstPage();
+    }
+
     return {
       props: {
         initialTodos: minifyRecords(todos),

@@ -15,18 +15,19 @@ const TodosProvider = ({ children }) => {
     }
   }
 
-  const addTodo = async (description) => {
+  const addTodo = async (todo) => {
     try {
       const response = await fetch("/api/createTodo", {
         method: 'POST',
-        body: JSON.stringify({ description }),
+        body: JSON.stringify({ description: todo }),
         headers: {
           "Content-Type": "application/json"
         }
       });
       const newTodo = await response.json();
       setTodos((prevTodos) => {
-        [newTodo, ...prevTodos]
+        const updatedTodos = [newTodo, ...prevTodos];
+        return updatedTodos;
       })
     } catch (error) {
       console.error(error)

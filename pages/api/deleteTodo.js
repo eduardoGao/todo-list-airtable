@@ -1,7 +1,12 @@
 import { table, getMinifyRecord } from "./utils/Airtable";
+import auth0 from "./utils/auth0";
+import ownsRecords from "./middleware/OwnsRecords"
 
-export default async (req, res) => {
+export default ownsRecords(async (req, res) => {
   const { id } = req.body;
+
+  const { user } = auth0.getSession(req)
+
   try {
     const deleteTodo = await table.destroy(id)
 
@@ -11,4 +16,4 @@ export default async (req, res) => {
     res.statusCode = 500
     res.json({ message: 'Something went wrong' })
   }
-};
+})
